@@ -1,0 +1,7 @@
+{
+    "YOUR_BINANCE_USER_ID": {
+        "exchange": "binance",
+        "key": "API_KEY",
+        "secret": "API_SECRET"
+    }
+}

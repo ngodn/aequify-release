@@ -1,0 +1,12 @@
+services:
+  aequify:
+    image: eins0fx/aequify:latest
+    environment:
+      LOG_LEVEL: debug
+    volumes:
+      - ./account.json:/app/account.json:ro
+      - ./config.json:/app/config.json:ro
+      - ./license.key:/app/license.key:ro
+      - ./logs:/app/logs
+      - ./db.sqlite:/app/db.sqlite
+    command: [ "serve", "--env", "production" ]
