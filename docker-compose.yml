@@ -1,6 +1,6 @@
 services:
   aequify:
-    image: eins0fx/aequify:latest
+    image: eins0fx/aequify:stable-0.30.0.11
     environment:
       LOG_LEVEL: debug
     volumes:
