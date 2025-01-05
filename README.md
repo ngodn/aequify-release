@@ -23,7 +23,7 @@ For inquiries, support, or license information, please contact through:
 
 ## Version
 
-Current stable version: `stable-0.14.0.4`
+Current stable version: `stable-0.69.0.420`
 
 ## Supported Exchanges
 
