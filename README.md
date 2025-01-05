@@ -2,12 +2,12 @@
 
 Aequify is an advanced cryptocurrency futures trading system that automates price volatility trading on Binance Futures USD-M (USDT-Margined). The system specializes in:
 
-1. Volatility Detection: Monitors and identifies significant price movements (configurable threshold, default 13%) across all trading pairs
-2. Smart Position Entry: Opens positions based on precise entry conditions with initial small position sizes
-3. Dynamic Position Building: Uses a two-layer hovering DCA system that continuously adapts to price movements
+1. Volatility Detection: Monitors and identifies significant price movements (configurable threshold) across all trading pairs
+3. Smart Position Entry: Opens positions based on precise entry conditions with initial small position sizes
+4. Dynamic Position Building: Uses a two-layer hovering DCA system that continuously adapts to price movements
    - Inner Layer: Aggressive averaging for smaller positions
    - Outer Layer: Safety net for larger drawdowns/rallies
-4. Intelligent Exit Management: Implements trailing take-profit mechanisms that adjust to market movements to secure profits
+5. Intelligent Exit Management: Implements trailing take-profit mechanisms that adjust to market movements to secure profits
 
 The system is designed for both long and short positions, with more aggressive parameters for longs (catching dips) and conservative settings for shorts (entering on price rises). It includes built-in risk management through position size limits, exposure control, and automatic order management.
 
