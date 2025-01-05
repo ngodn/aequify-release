@@ -1,6 +1,15 @@
 # Aequify
 
-Aequify is a sophisticated automated trading system designed for cryptocurrency futures trading. It implements multiple trading strategies with dynamic position management, including entry conditions, Dollar-Cost Averaging (DCA), and take-profit mechanisms.
+Aequify is an advanced cryptocurrency futures trading system that automates price volatility trading on Binance Futures USD-M (USDT-Margined). The system specializes in:
+
+1. Volatility Detection: Monitors and identifies significant price movements (configurable threshold, default 13%) across all trading pairs
+2. Smart Position Entry: Opens positions based on precise entry conditions with initial small position sizes
+3. Dynamic Position Building: Uses a two-layer hovering DCA system that continuously adapts to price movements
+   - Inner Layer: Aggressive averaging for smaller positions
+   - Outer Layer: Safety net for larger drawdowns/rallies
+4. Intelligent Exit Management: Implements trailing take-profit mechanisms that adjust to market movements to secure profits
+
+The system is designed for both long and short positions, with more aggressive parameters for longs (catching dips) and conservative settings for shorts (entering on price rises). It includes built-in risk management through position size limits, exposure control, and automatic order management.
 
 ## License
 
@@ -31,70 +40,88 @@ The system is configured through a `config.json` file that controls all aspects 
 
 ```json
 {
-  "account_id": "123456789",
-  "blacklisted_symbols": ["BTCUSDT", "OCEANUSDT"],
+  "account_id": "YOUR_BINANCE_USER_ID",
+  "blacklisted_symbols": ["BTCUSDT", "OCEANUSDT", "DGBUSDT", "AGIXUSDT", "STRAXUSDT"],
   "minimum_price_change_percent": 13.0,
   "state_sync_interval_s": 10
 }
 ```
 
-- `account_id`: Your trading account identifier
+- `account_id`: Your Binance user identifier
 - `blacklisted_symbols`: Trading pairs to exclude from trading
 - `minimum_price_change_percent`: Minimum price volatility required to consider a trading pair
 - `state_sync_interval_s`: How often (in seconds) the system synchronizes its state
 
 ### Strategy Configuration
 
-The strategy configuration is divided into long and short positions. Each has its own set of parameters optimized for their respective trading directions.
+The system implements two distinct trading strategies - Long and Short - each with its own configuration and behavior. Both strategies use the same general framework but with different parameters and thresholds optimized for their respective trading directions.
 
-## Long Strategy
+## Long Strategy (Buying dips)
+The long strategy is designed to catch downward price movements and accumulate positions at lower prices.
 
-### Position Management
+### Long Position Management
 ```json
 "long": {
   "max_running_symbols": 7,
   "exchange_leverage": 10,
-  "wallet_exposure_per_symbol": 500
+  "wallet_exposure_per_symbol": 500,
+  "entry": {
+    "initial_entry_quantity_in_usdt": 25
+  }
 }
 ```
 
-- `max_running_symbols`: Maximum number of concurrent positions
-- `exchange_leverage`: Trading leverage used (e.g., 10x)
-- `wallet_exposure_per_symbol`: Maximum wallet exposure per position in USDT
+- `max_running_symbols`: Can trade up to 7 symbols simultaneously
+- `exchange_leverage`: Uses 10x leverage
+- `wallet_exposure_per_symbol`: Maximum 500 USDT exposure per symbol
+- `initial_entry_quantity_in_usdt`: Starts with 25 USDT initial position
 
-### Entry Strategy
+### Long Entry Strategy
 ```json
 "entry": {
   "min_ticks": 10,
-  "price_change_interval_s": 13,
-  "price_change_threshold": -0.01
+  "price_change_interval_s": 7,
+  "price_change_threshold": -0.0075
 }
 ```
 
-This controls how positions are entered:
-- `min_ticks`: Minimum number of price updates required before entry
-- `price_change_interval_s`: Time window to monitor price changes (in seconds)
-- `price_change_threshold`: Required price change to trigger entry (-0.01 = -1% drop for long)
+Long entry conditions:
+- `min_ticks`: Requires minimum 10 price updates
+- `price_change_interval_s`: Monitors price over 7-second windows
+- `price_change_threshold`: Triggers on 0.75% price drops (-0.0075)
 
-### Hovering DCA (Dollar-Cost Averaging)
+### Long Hovering DCA
 ```json
 "hovering_dca": {
-  "hover_distance": -0.01,
-  "hover_price_change_interval_s": 13,
-  "hover_activation_distance_from_position_price": -0.0025,
-  "number_of_dca": 2,
-  "dca_size_multiplier": 4.55
+  "inner_layer": {
+    "hover_distance": -0.0075,
+    "hover_price_change_interval_s": 6,
+    "hover_activation_distance_from_position_price": -0.0025,
+    "dca_size_multiplier": 4.25
+  },
+  "outer_layer": {
+    "hover_distance": -0.01,
+    "hover_price_change_interval_s": 13,
+    "hover_activation_distance_from_position_price": -0.1,
+    "dca_size_multiplier": 4.55
+  }
 }
 ```
 
-DCA mechanism that activates when price moves against the position:
-- `hover_distance`: Price distance to place DCA orders (-0.01 = 1% below current price)
-- `hover_price_change_interval_s`: How often to check DCA conditions
-- `hover_activation_distance_from_position_price`: When to activate DCA (-0.0025 = -0.25% from entry)
-- `number_of_dca`: Maximum number of DCA orders
-- `dca_size_multiplier`: Size multiplier for each DCA order (4.55 means each DCA is 4.55x the previous order)
+Two-layer DCA system for longs:
+- Inner Layer (For positions < 50% max exposure):
+  - Places buy orders 0.75% below current price
+  - Updates every 6 seconds
+  - Activates when price drops 0.25% below entry
+  - Each DCA is 4.25x the previous order
 
-### Trailing Take-Profit
+- Outer Layer (For positions >= 50% max exposure):
+  - Places buy orders 1% below current price
+  - Updates every 13 seconds
+  - Activates when price drops 10% below entry
+  - Each DCA is 4.55x the previous order
+
+### Long Take-Profit Management
 ```json
 "trailing_tp": {
   "static_tp_distance": 0.015,
@@ -113,56 +140,64 @@ DCA mechanism that activates when price moves against the position:
 }
 ```
 
-Dynamic take-profit mechanism:
-- `static_tp_distance`: Initial take-profit target (0.015 = 1.5% above entry)
-- `trailing_activation_distance`: When to activate trailing (0.0075 = 0.75% profit)
-- `trailing_tp_interval_s`: How often to update trailing stops
-- `tp_upperbound`: Upper take-profit boundary
-  - `order_type`: LIMIT for direct take-profit at target price
-  - `distance_from_current_price`: Price distance for the order (0.35% above)
-  - `invalidate_threshold_from_current_price`: When to cancel and recreate the order
-- `tp_lowerbound`: Lower take-profit boundary
-  - `order_type`: STOP for stop-profit trigger when price pulls back
-  - `distance_from_current_price`: Price distance for the order (0.25% below)
-  - `invalidate_threshold_from_current_price`: When to cancel and recreate the order
+Long take-profit strategy:
+- Initial static take-profit at 1.5% above entry
+- Activates trailing mechanism at 0.75% profit
+- Updates every 5 seconds
+- Places two take-profit orders that work together:
+  - LIMIT sell order 0.35% above current price (takes profit immediately when price hits target)
+  - STOP sell order 0.25% below current price (trailing take-profit to lock in gains as price moves up)
 
 ### How Long Strategy Works
 
-1. The system monitors all trading pairs for downward volatility exceeding `minimum_price_change_percent`
-2. When a significant price drop is detected:
-   - Waits for minimum 10 price ticks
-   - Looks for 1% price drop within 13 seconds
-   - Opens long position if criteria met and under maximum positions
+1. Monitors for downward volatility (>13%)
+2. Entry Conditions:
+   - Waits for 10 price ticks minimum
+   - Looks for 0.75% drop within 7 seconds
+   - Opens 25 USDT long position if criteria met
 
-3. After Entry:
-   - Places initial take-profit at 1.5% above entry
-   - Monitors price movement for DCA opportunities
-   - Places DCA orders 1% below current price if price drops 0.25% below entry
-   - Can execute up to 2 DCA orders, each 4.55x the size of the previous
+3. DCA Management:
+   - Activates hovering DCA system that continuously monitors price:
+     - Small Positions (Inner Layer):
+       - Every 6 seconds, if price is 0.25% below entry
+       - Places dynamic buy orders 0.75% below current price
+       - Orders are continuously refreshed for optimal entry
+       - DCA size is 4.25x previous order
+     - Larger Positions (Outer Layer):
+       - Every 13 seconds, if price is 10% below entry
+       - Places dynamic buy orders 1% below current price
+       - Provides protection for deeper drawdowns
+       - DCA size is 4.55x previous order
 
-4. Take-Profit Management:
-   - Initially places a static take-profit order
-   - When price moves up 0.75%, activates trailing mechanism
-   - Places LIMIT order 0.35% above current price for direct profit-taking
-   - Places STOP order 0.25% below current price to protect profits
-   - Updates bounds every 5 seconds as price moves higher
+4. Exit Management:
+   - Starts with fixed take-profit at 1.5% above entry
+   - At 0.75% profit, switches to trailing take-profit:
+     - LIMIT sell order 0.35% above current price
+     - STOP protection order 0.25% below current price
+     - Updates bounds every 5 seconds as price rises
+   - All take-profit orders are for full position size
 
-## Short Strategy
+## Short Strategy (Short when price rises)
+The short strategy is designed to open short positions when prices show significant upward movement, aiming to profit from potential reversals. It accumulates larger short positions at higher prices if the upward movement continues. This strategy is more conservative than its long counterpart, using stricter entry conditions and smaller position sizes.
 
-### Position Management
+### Short Position Management
 ```json
 "short": {
   "max_running_symbols": 3,
   "exchange_leverage": 10,
-  "wallet_exposure_per_symbol": 200
+  "wallet_exposure_per_symbol": 200,
+  "entry": {
+    "initial_entry_quantity_in_usdt": 25
+  }
 }
 ```
 
-- `max_running_symbols`: Maximum number of concurrent short positions
-- `exchange_leverage`: Trading leverage used (e.g., 10x)
-- `wallet_exposure_per_symbol`: Maximum wallet exposure per position in USDT
+- `max_running_symbols`: Limited to 3 simultaneous symbols
+- `exchange_leverage`: Uses 10x leverage
+- `wallet_exposure_per_symbol`: Maximum 200 USDT exposure per symbol
+- `initial_entry_quantity_in_usdt`: Starts with 25 USDT initial position
 
-### Entry Strategy
+### Short Entry Strategy
 ```json
 "entry": {
   "min_ticks": 30,
@@ -171,35 +206,48 @@ Dynamic take-profit mechanism:
 }
 ```
 
-Controls short position entry:
-- `min_ticks`: Minimum number of price updates required before entry
-- `price_change_interval_s`: Time window to monitor price changes (in seconds)
-- `price_change_threshold`: Required price change to trigger entry (0.02 = 2% rise for short)
+Short entry conditions:
+- `min_ticks`: Requires minimum 30 price updates
+- `price_change_interval_s`: Monitors price over 13-second windows
+- `price_change_threshold`: Triggers on 2% price rises (0.02)
 
-### Hovering DCA (Dollar-Cost Averaging)
+### Short Hovering DCA
 ```json
 "hovering_dca": {
-  "hover_distance": 0.025,
-  "hover_price_change_interval_s": 10,
-  "hover_activation_distance_from_position_price": 0.1,
-  "number_of_dca": 1,
-  "dca_size_multiplier": 4.55
+  "inner_layer": {
+    "hover_distance": 0.025,
+    "hover_price_change_interval_s": 10,
+    "hover_activation_distance_from_position_price": 0.05,
+    "dca_size_multiplier": 4.25
+  },
+  "outer_layer": {
+    "hover_distance": 0.025,
+    "hover_price_change_interval_s": 10,
+    "hover_activation_distance_from_position_price": 0.25,
+    "dca_size_multiplier": 4.55
+  }
 }
 ```
 
-DCA mechanism that activates when price moves against the short position:
-- `hover_distance`: Price distance to place DCA orders (2.5% above current price)
-- `hover_price_change_interval_s`: How often to check DCA conditions
-- `hover_activation_distance_from_position_price`: When to activate DCA (10% above entry)
-- `number_of_dca`: Maximum number of DCA orders
-- `dca_size_multiplier`: Size multiplier for DCA order (4.55x the initial position)
+Two-layer DCA system for shorts:
+- Inner Layer (For positions < 50% max exposure):
+  - Places sell orders 2.5% above current price
+  - Updates every 10 seconds
+  - Activates when price rises 5% above entry
+  - Each DCA is 4.25x the previous order
 
-### Trailing Take-Profit
+- Outer Layer (For positions >= 50% max exposure):
+  - Places sell orders 2.5% above current price
+  - Updates every 10 seconds
+  - Activates when price rises 25% above entry
+  - Each DCA is 4.55x the previous order
+
+### Short Take-Profit Management
 ```json
 "trailing_tp": {
   "static_tp_distance": -0.015,
   "trailing_activation_distance_from_position_price": -0.0075,
-  "trailing_tp_interval_s": 3,
+  "trailing_tp_interval_s": 5,
   "tp_upperbound": {
     "order_type": "STOP",
     "distance_from_current_price": 0.0025,
@@ -213,39 +261,60 @@ DCA mechanism that activates when price moves against the short position:
 }
 ```
 
-Dynamic take-profit mechanism for shorts:
-- `static_tp_distance`: Initial take-profit target (1.5% below entry)
-- `trailing_activation_distance`: When to activate trailing (0.75% profit)
-- `trailing_tp_interval_s`: How often to update trailing stops
-- `tp_upperbound`: Upper boundary to protect profits
-  - `order_type`: STOP for stop-profit trigger when price bounces
-  - `distance_from_current_price`: Price distance for the order (0.25% above)
-  - `invalidate_threshold_from_current_price`: When to cancel and recreate the order
-- `tp_lowerbound`: Lower boundary for profit-taking
-  - `order_type`: LIMIT for direct take-profit at target price
-  - `distance_from_current_price`: Price distance for the order (0.35% below)
-  - `invalidate_threshold_from_current_price`: When to cancel and recreate the order
+Short take-profit strategy:
+- Initial static take-profit at 1.5% below entry
+- Activates trailing mechanism at 0.75% profit
+- Updates every 5 seconds
+- Places two take-profit orders that work together:
+  - LIMIT buy order 0.35% below current price (takes profit immediately when price hits target)
+  - STOP buy order 0.25% above current price (trailing take-profit to lock in gains as price moves down)
 
 ### How Short Strategy Works
 
-1. The system monitors trading pairs for upward volatility exceeding `minimum_price_change_percent`
-2. When a significant price rise is detected:
-   - Waits for minimum 30 price ticks
-   - Looks for 2% price rise within 13 seconds
-   - Opens short position if criteria met and under maximum positions
+1. Monitors for upward volatility (>13%)
+2. Entry Conditions:
+   - Waits for 30 price ticks minimum
+   - Looks for 2% rise within 13 seconds
+   - Opens 25 USDT short position if criteria met
 
-3. After Entry:
-   - Places initial take-profit at 1.5% below entry
-   - Monitors price movement for DCA opportunities
-   - Places DCA order 2.5% above current price if price rises 10% above entry
-   - Limited to 1 DCA order at 4.55x the initial position size
+3. DCA Management:
+   - Activates hovering DCA system that continuously monitors price:
+     - Small Positions (Inner Layer):
+       - Every 10 seconds, if price is 5% above entry
+       - Places dynamic sell orders 2.5% above current price
+       - Orders are continuously refreshed for optimal entry
+       - DCA size is 4.25x previous order
+     - Larger Positions (Outer Layer):
+       - Every 10 seconds, if price is 25% above entry
+       - Places dynamic sell orders 2.5% above current price
+       - Provides protection for stronger rallies
+       - DCA size is 4.55x previous order
 
-4. Take-Profit Management:
-   - Initially places a static take-profit order
-   - When price moves down 0.75%, activates trailing mechanism
-   - Places STOP order 0.25% above current price to protect profits
-   - Places LIMIT order 0.35% below current price for direct profit-taking
-   - Updates bounds every 3 seconds as price moves lower
+4. Exit Management:
+   - Starts with fixed take-profit at 1.5% below entry
+   - At 0.75% profit, switches to trailing take-profit:
+     - STOP buy order 0.25% above current price
+     - LIMIT buy order 0.35% below current price
+     - Updates bounds every 5 seconds as price falls
+   - All take-profit orders are for full position size
+
+### Key Differences Between Long and Short Strategies
+
+1. Position Management:
+   - Longs: More aggressive with 7 max positions and 500 USDT exposure
+   - Shorts: Conservative with 3 max positions and 200 USDT exposure
+
+2. Entry Conditions:
+   - Longs: Quicker entry (10 ticks, 7s window, 0.75% drop)
+   - Shorts: Stricter entry (30 ticks, 13s window, 2% rise)
+
+3. DCA Behavior:
+   - Longs: More frequent updates on inner layer (6s vs 10s)
+   - Shorts: Higher activation thresholds (5% and 25% vs 0.25% and 10%)
+
+4. Take-Profit:
+   - Both use similar mechanisms but inversed
+   - Order types are swapped (LIMIT/STOP) for respective directions
 
 ## Risk Management (Coming Soon)
 
@@ -276,9 +345,22 @@ The following risk management features will be available in the next version upd
 ```
 
 Planned risk management features:
-- `auto_profit_transfer`: Automatically transfer profits to funding wallet
-- `auto_hedge`: Create hedge positions automatically
-- `auto_reduce_stuck_position`: Reduce losing positions automatically
-- `no_entry_only_exit`: Disable new entries while allowing exits
+- `auto_profit_transfer`: Automatically transfer profits to funding wallet when daily profit threshold is reached
+- `auto_hedge`: Automatically create hedge positions when price moves significantly against existing positions
+- `auto_reduce_stuck_position`: Automatically reduce losing positions based on unrealized loss thresholds
+- `no_entry_only_exit`: Emergency mode that prevents new entries while allowing positions to be closed
 
 Note: These features are currently under development and will be available in a future release. For now, please keep the `risk_management` section in your config but leave all features disabled.
+
+## Redis Configuration
+
+The system uses Redis for state management:
+
+```json
+"redis": {
+  "hostname": "redis",
+  "port": 6379
+}
+```
+
+Required for real-time data synchronization and position tracking.
