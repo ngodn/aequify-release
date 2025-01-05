@@ -150,7 +150,7 @@ Long take-profit strategy:
 
 ### How Long Strategy Works
 
-1. Monitors for downward volatility (>13%)
+1. Monitors for downward volatility
 2. Entry Conditions:
    - Waits for 10 price ticks minimum
    - Looks for 0.75% drop within 7 seconds
@@ -271,13 +271,13 @@ Short take-profit strategy:
 
 ### How Short Strategy Works
 
-1. Monitors for upward volatility (>13%)
+1. Monitors for upward volatility
 2. Entry Conditions:
    - Waits for 30 price ticks minimum
    - Looks for 2% rise within 13 seconds
    - Opens 25 USDT short position if criteria met
-
-3. DCA Management:
+   
+3 DCA Management:
    - Activates hovering DCA system that continuously monitors price:
      - Small Positions (Inner Layer):
        - Every 10 seconds, if price is 5% above entry
