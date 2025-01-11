@@ -12,7 +12,7 @@ services:
       retries: 5
 
   aequify:
-    image: eins0fx/aequify:stable-0.69.0.420
+    image: eins0fx/aequify:stable-0.86.0.1103
     environment:
       LOG_LEVEL: debug
       REDIS_URL: redis://redis:6379
