@@ -23,7 +23,7 @@ For inquiries, support, or license information, please contact through:
 
 ## Version
 
-Current stable version: `stable-0.69.0.420`
+Current stable version: `stable-0.99.0.0214`
 
 ## Supported Exchanges
 
@@ -316,41 +316,64 @@ Short take-profit strategy:
    - Both use similar mechanisms but inversed
    - Order types are swapped (LIMIT/STOP) for respective directions
 
-## Risk Management (Coming Soon)
+## Risk Management
 
-The following risk management features will be available in the next version update:
+Aequify includes advanced risk management features designed to protect positions and automate profit-taking:
 
+### Auto Hedge Strategy
+
+The auto hedge feature provides automated position protection through two distinct strategies:
+
+#### 1. Stuck Long Protection (STUCK_LONG_OPEN_SHORT)
+Automatically creates hedge positions for stuck long trades by opening counterbalancing short positions.
+
+Configuration:
 ```json
-"risk_management": {
-  "auto_profit_transfer": {
-    "enabled": false,
-    "target_wallet": "FUNDING",
-    "daily_profit_pct_threshold": 0.5
-  },
-  "auto_hedge": {
-    "enabled": false,
-    "activation_distance_from_opposite_position_price": 1.25,
-    "quantity_pct_from_opposite_position_quantity": 0.05
-  },
-  "auto_reduce_stuck_position": {
-    "enabled": false,
-    "unrealized_pct_activation_threshold": -1.5,
-    "quantity_pct_to_reduce_from_position_quantity": 0.1,
-    "reduced_unrealized_pct_activation_threshold": 0.5
-  },
-  "no_entry_only_exit": {
-    "enabled": false
+"auto_hedge": {
+  "enabled": true,
+  "position_check_interval_s": 5,
+  "entry_strategy": {
+    "activation_mode": "STUCK_LONG_OPEN_SHORT",
+    "activate_when_stuck_position_quantity_exceeds_exposure": 0.5,
+    "activation_distance_from_stuck_position_price": 0.05,
+    "quantity_pct_from_stuck_position_quantity": 0.5
   }
 }
 ```
 
-Planned risk management features:
+Activation conditions:
+- Position value exceeds 50% of maximum wallet exposure
+- Price drops 5% below entry price
+- Creates a hedge short position of 50% of the long position size
+
+Operation:
+- Monitors long positions every 5 seconds
+- When conditions are met, opens a market short position
+- Maintains the hedge until exit conditions are met
+
+#### 2. Zero Sum Exit Strategy (ZERO_SUM)
+Automatically manages and closes paired long-short positions when their combined PnL becomes positive.
+
+Configuration:
+```json
+"exit_strategy": {
+  "activation_mode": "ZERO_SUM"
+}
+```
+
+Operation:
+- Continuously monitors paired long-short positions
+- Calculates combined unrealized PnL
+- When total PnL becomes positive, closes both positions using market orders
+- Helps secure profits while minimizing losses
+
+### Planned risk management features:
 - `auto_profit_transfer`: Automatically transfer profits to funding wallet when daily profit threshold is reached
-- `auto_hedge`: Automatically create hedge positions when price moves significantly against existing positions
 - `auto_reduce_stuck_position`: Automatically reduce losing positions based on unrealized loss thresholds
 - `no_entry_only_exit`: Emergency mode that prevents new entries while allowing positions to be closed
 
 Note: These features are currently under development and will be available in a future release. For now, please keep the `risk_management` section in your config but leave all features disabled.
+
 
 ## Redis Configuration
 
