@@ -3,13 +3,14 @@
 Aequify is an advanced cryptocurrency futures trading system that automates price volatility trading on Binance Futures USD-M (USDT-Margined). The system specializes in:
 
 1. Volatility Detection: Monitors and identifies significant price movements (configurable threshold) across all trading pairs
-3. Smart Position Entry: Opens positions based on precise entry conditions with initial small position sizes
-4. Dynamic Position Building: Uses a two-layer hovering DCA system that continuously adapts to price movements
+2. Smart Position Entry: Opens positions based on precise entry conditions with initial small position sizes and reversal protection
+3. Dynamic Position Building: Uses a two-layer hovering DCA system that continuously adapts to price movements
    - Inner Layer: Aggressive averaging for smaller positions
    - Outer Layer: Safety net for larger drawdowns/rallies
-5. Intelligent Exit Management: Implements trailing take-profit mechanisms that adjust to market movements to secure profits
+4. Intelligent Exit Management: Implements trailing take-profit mechanisms that adjust to market movements to secure profits
+5. Advanced Risk Management: Features auto-hedging, zero-sum strategy, profit transfer, and stuck position reduction
 
-The system is designed for both long and short positions, with more aggressive parameters for longs (catching dips) and conservative settings for shorts (entering on price rises). It includes built-in risk management through position size limits, exposure control, and automatic order management.
+The system is designed for both long and short positions, with more aggressive parameters for longs (catching dips) and conservative settings for shorts (entering on price rises). It includes built-in risk management through position size limits, exposure control, directional trend filtering, and automatic order management.
 
 ## License
 
@@ -23,7 +24,7 @@ For inquiries, support, or license information, please contact through:
 
 ## Version
 
-Current stable version: `stable-0.99.0.0214`
+Current stable version: `stable-0.99.1.8686`
 
 ## Supported Exchanges
 
@@ -62,6 +63,9 @@ The long strategy is designed to catch downward price movements and accumulate p
 ### Long Position Management
 ```json
 "long": {
+  "reversal_protection": true,
+  "directional_price_change_percent": true,
+  "directional_minimum_price_change_percent": -5.0,
   "max_running_symbols": 7,
   "exchange_leverage": 10,
   "wallet_exposure_per_symbol": 500,
@@ -71,6 +75,9 @@ The long strategy is designed to catch downward price movements and accumulate p
 }
 ```
 
+- `reversal_protection`: Prevents entries when price direction reverses (checks if current price is lower than previous 1-minute candle close)
+- `directional_price_change_percent`: Enables filtering by overall market direction
+- `directional_minimum_price_change_percent`: Only enters when 24h price change is below -5% (downtrend confirmation)
 - `max_running_symbols`: Can trade up to 7 symbols simultaneously
 - `exchange_leverage`: Uses 10x leverage
 - `wallet_exposure_per_symbol`: Maximum 500 USDT exposure per symbol
@@ -152,9 +159,11 @@ Long take-profit strategy:
 
 1. Monitors for downward volatility
 2. Entry Conditions:
+   - Checks overall 24h price change is below -5% (if directional filter enabled)
+   - Ensures price is not reversing (if reversal protection enabled)
    - Waits for 10 price ticks minimum
    - Looks for 0.75% drop within 7 seconds
-   - Opens 25 USDT long position if criteria met
+   - Opens 25 USDT long position with MARKET order if all criteria met
 
 3. DCA Management:
    - Activates hovering DCA system that continuously monitors price:
@@ -183,6 +192,9 @@ The short strategy is designed to open short positions when prices show signific
 ### Short Position Management
 ```json
 "short": {
+  "reversal_protection": true,
+  "directional_price_change_percent": true,
+  "directional_minimum_price_change_percent": 25.0,
   "max_running_symbols": 3,
   "exchange_leverage": 10,
   "wallet_exposure_per_symbol": 200,
@@ -192,6 +204,9 @@ The short strategy is designed to open short positions when prices show signific
 }
 ```
 
+- `reversal_protection`: Prevents entries when price direction reverses (checks if current price is higher than previous 1-minute candle close)
+- `directional_price_change_percent`: Enables filtering by overall market direction
+- `directional_minimum_price_change_percent`: Only enters when 24h price change is above 25% (strong uptrend confirmation)
 - `max_running_symbols`: Limited to 3 simultaneous symbols
 - `exchange_leverage`: Uses 10x leverage
 - `wallet_exposure_per_symbol`: Maximum 200 USDT exposure per symbol
@@ -273,11 +288,13 @@ Short take-profit strategy:
 
 1. Monitors for upward volatility
 2. Entry Conditions:
+   - Checks overall 24h price change is above 25% (if directional filter enabled)
+   - Ensures price is not reversing (if reversal protection enabled)
    - Waits for 30 price ticks minimum
    - Looks for 2% rise within 13 seconds
-   - Opens 25 USDT short position if criteria met
+   - Opens 25 USDT short position with MARKET order if all criteria met
    
-3 DCA Management:
+3. DCA Management:
    - Activates hovering DCA system that continuously monitors price:
      - Small Positions (Inner Layer):
        - Every 10 seconds, if price is 5% above entry
@@ -304,17 +321,26 @@ Short take-profit strategy:
    - Longs: More aggressive with 7 max positions and 500 USDT exposure
    - Shorts: Conservative with 3 max positions and 200 USDT exposure
 
-2. Entry Conditions:
+2. Directional Filtering:
+   - Longs: Requires 24h price change below -5% (downtrend confirmation)
+   - Shorts: Requires 24h price change above 25% (strong uptrend confirmation)
+
+3. Entry Conditions:
    - Longs: Quicker entry (10 ticks, 7s window, 0.75% drop)
    - Shorts: Stricter entry (30 ticks, 13s window, 2% rise)
 
-3. DCA Behavior:
+4. DCA Behavior:
    - Longs: More frequent updates on inner layer (6s vs 10s)
    - Shorts: Higher activation thresholds (5% and 25% vs 0.25% and 10%)
 
-4. Take-Profit:
+5. Take-Profit:
    - Both use similar mechanisms but inversed
    - Order types are swapped (LIMIT/STOP) for respective directions
+
+6. Reversal Protection:
+   - Both use 1-minute candle close comparisons
+   - Longs: Only enter when price is lower than previous 1m candle close
+   - Shorts: Only enter when price is higher than previous 1m candle close
 
 ## Risk Management
 
@@ -337,6 +363,9 @@ Configuration:
     "activate_when_stuck_position_quantity_exceeds_exposure": 0.5,
     "activation_distance_from_stuck_position_price": 0.05,
     "quantity_pct_from_stuck_position_quantity": 0.5
+  },
+  "exit_strategy": {
+    "activation_mode": "ZERO_SUM"
   }
 }
 ```
@@ -348,31 +377,64 @@ Activation conditions:
 
 Operation:
 - Monitors long positions every 5 seconds
-- When conditions are met, opens a market short position
+- When conditions are met, opens a MARKET short position
 - Maintains the hedge until exit conditions are met
 
 #### 2. Zero Sum Exit Strategy (ZERO_SUM)
 Automatically manages and closes paired long-short positions when their combined PnL becomes positive.
 
-Configuration:
+Operation:
+- Monitors paired long-short positions
+- Calculates combined unrealized PnL for both positions
+- When total PnL becomes positive, closes both positions using TAKE_PROFIT_MARKET orders
+- Helps secure profits while minimizing losses from stuck positions
+
+### Additional Risk Management Features
+
+Aequify now includes full implementations of all previously planned risk management features:
+
+#### Auto Profit Transfer
+
 ```json
-"exit_strategy": {
-  "activation_mode": "ZERO_SUM"
+"auto_profit_transfer": {
+  "enabled": true,
+  "target_wallet": "FUNDING",
+  "daily_profit_pct_threshold": 5.0
 }
 ```
 
-Operation:
-- Continuously monitors paired long-short positions
-- Calculates combined unrealized PnL
-- When total PnL becomes positive, closes both positions using market orders
-- Helps secure profits while minimizing losses
+Automatically transfers profits to your funding wallet when:
+- Daily profit percentage exceeds the configured threshold (5.0%)
+- Transfers excess profits to protect and secure earnings
 
-### Planned risk management features:
-- `auto_profit_transfer`: Automatically transfer profits to funding wallet when daily profit threshold is reached
-- `auto_reduce_stuck_position`: Automatically reduce losing positions based on unrealized loss thresholds
-- `no_entry_only_exit`: Emergency mode that prevents new entries while allowing positions to be closed
+#### Auto Reduce Stuck Position
 
-Note: These features are currently under development and will be available in a future release. For now, please keep the `risk_management` section in your config but leave all features disabled.
+```json
+"auto_reduce_stuck_position": {
+  "enabled": true,
+  "unrealized_pct_activation_threshold": -30.0,
+  "quantity_pct_to_reduce_from_position_quantity": 0.5,
+  "reduced_unrealized_pct_activation_threshold": -40.0
+}
+```
+
+Provides automated partial position reduction when:
+- Unrealized loss exceeds 30% of position value
+- Cuts position size by 50% to reduce exposure 
+- Further reduces if losses reach 40% threshold
+
+#### No Entry Only Exit
+
+```json
+"no_entry_only_exit": {
+  "enabled": false
+}
+```
+
+Emergency mode that:
+- Prevents new position entries
+- Allows existing positions to be closed
+- Can be enabled during high market uncertainty or system maintenance
 
 
 ## Redis Configuration
