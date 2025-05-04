@@ -1,5 +1,5 @@
 {
-  "account_id": "YOUR_BINANCE_USER_ID",
+  "account_id": "218638952",
   "blacklisted_symbols": [
     "BTCUSDT",
     "OCEANUSDT",
@@ -12,7 +12,10 @@
     "CATIUSDT",
     "ALPACAUSDT",
     "BNXUSDT",
-    "1000WHYUSDT"
+    "1000WHYUSDT",
+    "FLMUSDT",
+    "1000RATSUSDT",
+    "CELOUSDT"
   ],
   "minimum_price_change_percent": 5.0,
   "state_sync_interval_s": 30,
@@ -20,19 +23,19 @@
     "long": {
       "reversal_protection": true,
       "directional_price_change_percent": true,
-      "directional_minimum_price_change_percent": -5.0,
+      "directional_minimum_price_change_percent": -2.0,
       "max_running_symbols": 75,
       "exchange_leverage": 10,
       "wallet_exposure_per_symbol": 1000,
       "entry": {
         "initial_entry_quantity_in_usdt": 125,
         "min_ticks": 10,
-        "price_change_interval_s": 60,
-        "price_change_threshold": -0.01
+        "price_change_interval_s": 180,
+        "price_change_threshold": -0.015
       },
       "hovering_dca": {
         "inner_layer": {
-          "hover_distance": -0.004,
+          "hover_distance": -0.005,
           "hover_price_change_interval_s": 4,
           "hover_activation_distance_from_position_price": -0.00125,
           "dca_size_multiplier": 2.55
@@ -50,7 +53,7 @@
         "trailing_tp_interval_s": 8,
         "tp_upperbound": {
           "order_type": "LIMIT",
-          "distance_from_current_price": 0.0025,
+          "distance_from_current_price": 0.0035,
           "invalidate_threshold_from_current_price": 0.000775
         },
         "tp_lowerbound": {
@@ -63,7 +66,7 @@
     "short": {
       "reversal_protection": true,
       "directional_price_change_percent": true,
-      "directional_minimum_price_change_percent": 7.0,
+      "directional_minimum_price_change_percent": 20.0,
       "max_running_symbols": 30,
       "exchange_leverage": 10,
       "wallet_exposure_per_symbol": 1000,
@@ -71,12 +74,12 @@
         "initial_entry_quantity_in_usdt": 75,
         "min_ticks": 30,
         "price_change_interval_s": 60,
-        "price_change_threshold": 0.03
+        "price_change_threshold": 0.045
       },
       "hovering_dca": {
         "inner_layer": {
-          "hover_distance": 0.0275,
-          "hover_price_change_interval_s": 8,
+          "hover_distance": 0.0475,
+          "hover_price_change_interval_s": 6,
           "hover_activation_distance_from_position_price": 0.015,
           "dca_size_multiplier": 2.55
         },
@@ -138,4 +141,3 @@
     "port": 6379
   }
 }
-
