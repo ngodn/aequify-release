@@ -14,7 +14,7 @@
     "BNXUSDT",
     "1000WHYUSDT"
   ],
-  "minimum_price_change_percent": 10.0,
+  "minimum_price_change_percent": 5.0,
   "state_sync_interval_s": 30,
   "strategy_config": {
     "long": {
