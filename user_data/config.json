@@ -1,5 +1,5 @@
 {
-  "account_id": "218638952",
+  "account_id": "YOUR_BINANCE_USER_ID",
   "blacklisted_symbols": [
     "BTCUSDT",
     "OCEANUSDT",
@@ -23,7 +23,7 @@
     "long": {
       "reversal_protection": true,
       "directional_price_change_percent": true,
-      "directional_minimum_price_change_percent": -2.0,
+      "directional_minimum_price_change_percent": 10.0,
       "max_running_symbols": 75,
       "exchange_leverage": 10,
       "wallet_exposure_per_symbol": 1000,
