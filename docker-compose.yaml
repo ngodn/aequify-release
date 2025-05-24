@@ -5,6 +5,25 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+    # Alternative: Some persistence for critical data
+    command: >
+      redis-server
+      --save "900 1"
+      --save "300 100"
+      --save "60 50000"
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --tcp-keepalive 60
+      --timeout 0
+      --tcp-backlog 511
+      --databases 3
+      --stop-writes-on-bgsave-error no
+      --rdbcompression no
+      --lazyfree-lazy-eviction yes
+      --lazyfree-lazy-expire yes
+      --lazyfree-lazy-server-del yes
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
