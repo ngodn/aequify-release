@@ -12,32 +12,32 @@ function Print-Step {
 Print-Step "Stopping Docker Compose services"
 docker compose down
 
-# Stop all running containers
-Print-Step "Stopping all running containers"
-$runningContainers = docker ps -q
+# Stop all running containers except PostgreSQL and pgAdmin
+Print-Step "Stopping all running containers (except PostgreSQL and pgAdmin)"
+$runningContainers = docker ps -q --filter "name=^(?!.*(postgres|pgadmin)).*"
 if ($runningContainers) {
     docker stop $runningContainers
 }
 
-# Remove all containers
-Print-Step "Removing all containers"
-$allContainers = docker ps -aq
+# Remove all containers except PostgreSQL and pgAdmin
+Print-Step "Removing all containers (except PostgreSQL and pgAdmin)"
+$allContainers = docker ps -aq --filter "name=^(?!.*(postgres|pgadmin)).*"
 if ($allContainers) {
     docker rm $allContainers
 }
 
-# Remove all images forcefully
-Print-Step "Removing all Docker images"
-$allImages = docker images -q
+# Remove all images except PostgreSQL and pgAdmin images
+Print-Step "Removing all Docker images (except PostgreSQL and pgAdmin)"
+$allImages = docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | Where-Object { $_ -notmatch "postgres|pgadmin" } | ForEach-Object { ($_ -split ' ')[1] }
 if ($allImages) {
     docker rmi -f $allImages
 }
 
-# Remove all volumes
-Print-Step "Removing all Docker volumes"
-$volumes = docker volume ls -q
+# Remove all volumes except PostgreSQL and pgAdmin volumes
+Print-Step "Removing all Docker volumes (except PostgreSQL and pgAdmin)"
+$volumes = docker volume ls -q | Where-Object { $_ -notmatch "postgres|pgadmin" }
 if ($volumes) {
     $volumes | ForEach-Object { docker volume rm $_ }
 }
 
-Write-Host "`nDocker cleanup completed successfully!" -ForegroundColor Green
+Write-Host "`nDocker cleanup completed successfully! (PostgreSQL and pgAdmin preserved)" -ForegroundColor Green

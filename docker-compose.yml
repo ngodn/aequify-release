@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: aequify_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: aequifive
+      POSTGRES_PASSWORD: aequifive
+      POSTGRES_DB: aequifive
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aequifive -d aequifive"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  aeqcore:
+    image: eins0fx/aequify-ive:stable-1.00.1.9999
+    container_name: aequify_core
+    restart: unless-stopped
+    environment:
+      LOG_LEVEL: debug
+      DATABASE_URL: postgresql://aequifive:aequifive@postgres:5432/aequifive
+    volumes:
+      - ./user_data:/app/user_data
+    command: ["serve"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
