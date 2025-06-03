@@ -135,7 +135,7 @@
                     "snr": {
                         "lookback_period": "3M",
                         "max_n_of_dca": 2,
-                        "level_selection": "FARTHEST",
+                        "level_selection": "CLOSEST",
                         "dca_size_multiplier": 2.5
                     },
                     "hovering_dca": {
@@ -172,7 +172,7 @@
                     "snr": {
                         "lookback_period": "3M",
                         "max_n_of_dca": 2,
-                        "level_selection": "FARTHEST",
+                        "level_selection": "EVEN",
                         "dca_size_multiplier": 2.5
                     },
                     "hovering_dca": {
@@ -256,13 +256,13 @@
             },
             "entry_validation": {
                 "spot": {
-                    "minimum_price_change_pct": 1.0,
+                    "minimum_price_change_pct": -1.0,
                     "detection_time_window_s": 180,
                     "minimum_drop_angle": -30,
                     "entry_type": "INSTANT"
                 },
                 "long": {
-                    "minimum_price_change_pct": 1.0,
+                    "minimum_price_change_pct": -1.0,
                     "detection_time_window_s": 180,
                     "minimum_drop_angle": -30,
                     "entry_type": "INSTANT"
@@ -276,11 +276,11 @@
             }
         },
         "redis": {
-            "hostname": "localhost",
+            "hostname": "redis",
             "port": 6379
         },
         "postgres": {
-            "hostname": "localhost",
+            "hostname": "postgres",
             "port": 5432,
             "POSTGRES_USER": "aequifive",
             "POSTGRES_PASSWORD": "aequifive",
