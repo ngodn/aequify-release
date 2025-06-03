@@ -47,4 +47,4 @@ docker compose up -d
 # Show logs
 Print-Step "Showing Docker Compose logs"
 Write-Host "`nPress Ctrl+C to stop viewing logs`n" -ForegroundColor Yellow
-docker compose logs -f
+docker compose logs -f aeqcore

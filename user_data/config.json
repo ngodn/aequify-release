@@ -98,12 +98,12 @@
     },
     "risk_management": {
         "auto_profit_transfer": {
-            "enabled": true,
+            "enabled": false,
             "target_wallet": "FUNDING",
             "daily_profit_pct_threshold": 50.0
         },
         "time_based_stoploss": {
-            "enabled": true,
+            "enabled": false,
             "activate_only_for_position_with_size_less_than": 20.0,
             "activate_when_ROI_pct_is": -50.0,
             "exit_mode": "FORCE_CLOSE_POSITION"
@@ -119,7 +119,7 @@
             "short_enabled": true,
             "margin_mode": "CROSSED",
             "leverage": 10,
-            "wallet_exposure_per_symbol": 1000
+            "wallet_exposure_per_symbol": 150
         },
         "strategy": {
             "spot": {
@@ -257,20 +257,20 @@
             "entry_validation": {
                 "spot": {
                     "minimum_price_change_pct": -1.0,
-                    "detection_time_window_s": 180,
-                    "minimum_drop_angle": -30,
+                    "detection_time_window_s": 60,
+                    "minimum_drop_angle": -55,
                     "entry_type": "INSTANT"
                 },
                 "long": {
                     "minimum_price_change_pct": -1.0,
-                    "detection_time_window_s": 180,
-                    "minimum_drop_angle": -30,
+                    "detection_time_window_s": 60,
+                    "minimum_drop_angle": -55,
                     "entry_type": "INSTANT"
                 },
                 "short": {
                     "minimum_price_change_pct": 1.5,
-                    "detection_time_window_s": 180,
-                    "minimum_spike_angle": 30,
+                    "detection_time_window_s": 60,
+                    "minimum_spike_angle": 55,
                     "entry_type": "INSTANT"
                 }
             }
@@ -305,7 +305,7 @@
             "snr": false,
             "dca": false,
             "position_manager": false,
-            "tp": true
+            "tp": false
         },
         "run_optimizer_in_background": {
             "volatile_entry": {
