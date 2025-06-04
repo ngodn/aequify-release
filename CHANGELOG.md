@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025-06-04 0004 aequify-ive:stable-1.00.1.9999
+```txt
+- Replace invalidation method in Entry Strategy with time based check instead of BB
+```
+
 ## 2025-06-04 0003 aequify-ive:stable-1.00.1.9999
 ```txt
 - Fix critical database precondition issues

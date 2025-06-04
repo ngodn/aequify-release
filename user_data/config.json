@@ -5,17 +5,17 @@
             "pricechangepct24hr_filter": {
                 "enabled": true,
                 "spot": {
-                    "pct_higher_than": 100.0,
-                    "pct_lower_than": -100.0
+                    "pct_higher_than": 999.0,
+                    "pct_lower_than": -999.0
                 },
                 "futures": {
                     "long": {
                         "pct_higher_than": 5.0,
-                        "pct_lower_than": -3.5
+                        "pct_lower_than": -5.0
                     },
                     "short": {
-                        "pct_higher_than": 20.0,
-                        "pct_lower_than": -100.0
+                        "pct_higher_than": 5.0,
+                        "pct_lower_than": -5.0
                     }
                 }
             },
@@ -125,10 +125,10 @@
             "spot": {
                 "max_running_symbols": 150,
                 "entry": {
-                    "initial_entry_quantity_in_usdt": 6.5,
-                    "hover_distance_pct": -0.3,
-                    "hover_refresh_interval_s": 5,
-                    "invalidate_timeframe": "1m"
+                    "initial_entry_quantity_in_usdt": 10.5,
+                    "hover_distance_pct": -0.75,
+                    "hover_refresh_interval_s": 7,
+                    "invalidate_after_s": 300
                 },
                 "dca": {
                     "mode": "snr",
@@ -139,16 +139,16 @@
                         "dca_size_multiplier": 2.5
                     },
                     "hovering_dca": {
-                        "hover_distance_pct": -0.75,
-                        "hover_refresh_interval_s": 5,
-                        "dca_size_multiplier": 2.5,
+                        "hover_distance_pct": -1.0,
+                        "hover_refresh_interval_s": 8,
+                        "dca_size_multiplier": 5,
                         "max_position_size_in_usdt": 100
                     }
                 },
                 "trailing_tp": {
                     "static_tp_distance_pct": 2.0,
-                    "trailing_activation_distance_pct_from_position_price": 0.3,
-                    "trailing_tp_interval_s": 10,
+                    "trailing_activation_distance_pct_from_position_price": 0.35,
+                    "trailing_tp_interval_s": 13,
                     "tp_upperbound": {
                         "order_type": "LIMIT",
                         "distance_pct_from_current_price": 1.0
@@ -162,30 +162,30 @@
             "long": {
                 "max_running_symbols": 150,
                 "entry": {
-                    "initial_entry_quantity_in_usdt": 6.5,
-                    "hover_distance_pct": -0.3,
-                    "hover_refresh_interval_s": 5,
-                    "invalidate_timeframe": "1m"
+                    "initial_entry_quantity_in_usdt": 10.5,
+                    "hover_distance_pct": -0.75,
+                    "hover_refresh_interval_s": 7,
+                    "invalidate_after_s": 300
                 },
                 "dca": {
                     "mode": "hovering_dca",
                     "snr": {
                         "lookback_period": "3M",
                         "max_n_of_dca": 2,
-                        "level_selection": "EVEN",
+                        "level_selection": "CLOSEST",
                         "dca_size_multiplier": 2.5
                     },
                     "hovering_dca": {
-                        "hover_distance_pct": -0.75,
-                        "hover_refresh_interval_s": 5,
+                        "hover_distance_pct": -1.0,
+                        "hover_refresh_interval_s": 8,
                         "dca_size_multiplier": 2.5,
                         "max_position_size_in_usdt": 100
                     }
                 },
                 "trailing_tp": {
                     "static_tp_distance_pct": 2.0,
-                    "trailing_activation_distance_pct_from_position_price": 0.3,
-                    "trailing_tp_interval_s": 10,
+                    "trailing_activation_distance_pct_from_position_price": 0.35,
+                    "trailing_tp_interval_s": 5,
                     "tp_upperbound": {
                         "order_type": "LIMIT",
                         "distance_pct_from_current_price": 1.0
@@ -201,28 +201,28 @@
                 "entry": {
                     "initial_entry_quantity_in_usdt": 6.5,
                     "hover_distance_pct": 1.0,
-                    "hover_refresh_interval_s": 3,
-                    "invalidate_timeframe": "15"
+                    "hover_refresh_interval_s": 7,
+                    "invalidate_after_s": 300
                 },
                 "dca": {
                     "mode": "hovering_dca",
                     "snr": {
                         "lookback_period": "3M",
                         "max_n_of_dca": 2,
-                        "level_selection": "FARTHEST",
+                        "level_selection": "CLOSEST",
                         "dca_size_multiplier": 2.5
                     },
                     "hovering_dca": {
-                        "hover_distance_pct": 2.0,
-                        "hover_refresh_interval_s": 5,
-                        "dca_size_multiplier": 2.5,
+                        "hover_distance_pct": 1.0,
+                        "hover_refresh_interval_s": 9,
+                        "dca_size_multiplier": 5,
                         "max_position_size_in_usdt": 100
                     }
                 },
                 "trailing_tp": {
                     "static_tp_distance_pct": 5.0,
-                    "trailing_activation_distance_pct_from_position_price": -0.3,
-                    "trailing_tp_interval_s": 10,
+                    "trailing_activation_distance_pct_from_position_price": -0.35,
+                    "trailing_tp_interval_s": 5,
                     "tp_upperbound": {
                         "order_type": "STOP",
                         "distance_pct_from_current_price": 0.25
@@ -256,22 +256,22 @@
             },
             "entry_validation": {
                 "spot": {
-                    "minimum_price_change_pct": -1.0,
+                    "minimum_price_change_pct": -0.4,
                     "detection_time_window_s": 60,
                     "minimum_drop_angle": -55,
-                    "entry_type": "INSTANT"
+                    "entry_type": "HOVER"
                 },
                 "long": {
-                    "minimum_price_change_pct": -1.0,
+                    "minimum_price_change_pct": -0.4,
                     "detection_time_window_s": 60,
                     "minimum_drop_angle": -55,
-                    "entry_type": "INSTANT"
+                    "entry_type": "HOVER"
                 },
                 "short": {
-                    "minimum_price_change_pct": 1.5,
+                    "minimum_price_change_pct": 0.7,
                     "detection_time_window_s": 60,
                     "minimum_spike_angle": 55,
-                    "entry_type": "INSTANT"
+                    "entry_type": "HOVER"
                 }
             }
         },
@@ -293,7 +293,7 @@
             "max_connections": 100
         },
         "state_sync_check_interval_s": {
-            "positions_rest_api": 7,
+            "positions_rest_api": 10,
             "filters": 300
         },
         "log_debug": {
@@ -303,9 +303,9 @@
             "candlestore": false,
             "volatile_entry": false,
             "snr": false,
-            "dca": false,
+            "dca": true,
             "position_manager": false,
-            "tp": false
+            "tp": true
         },
         "run_optimizer_in_background": {
             "volatile_entry": {
