@@ -60,7 +60,7 @@ Filters symbols based on 24-hour price change percentage thresholds.
 
 - **pair**: Base pair for trading (e.g., "USDT")
 - **blacklist**: Symbols to exclude from trading
-- **whitelist**: Symbols to prioritize (overrides blacklist)
+- **whitelist**: Symbols to prioritize (overrides blacklist and previous filters)
 
 #### Age Filter
 
