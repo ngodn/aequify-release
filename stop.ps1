@@ -14,28 +14,28 @@ docker compose down
 
 # Stop all running containers except PostgreSQL and pgAdmin
 Print-Step "Stopping all running containers (except PostgreSQL and pgAdmin)"
-$runningContainers = docker ps -q --filter "name=^(?!.*(postgres|pgadmin)).*"
+$runningContainers = docker ps -q --filter "name=^(?!.*(postgres|pgadmin|aeq-ive-db)).*"
 if ($runningContainers) {
     docker stop $runningContainers
 }
 
 # Remove all containers except PostgreSQL and pgAdmin
 Print-Step "Removing all containers (except PostgreSQL and pgAdmin)"
-$allContainers = docker ps -aq --filter "name=^(?!.*(postgres|pgadmin)).*"
+$allContainers = docker ps -aq --filter "name=^(?!.*(postgres|pgadmin|aeq-ive-db)).*"
 if ($allContainers) {
     docker rm $allContainers
 }
 
 # Remove all images except PostgreSQL and pgAdmin images
 Print-Step "Removing all Docker images (except PostgreSQL and pgAdmin)"
-$allImages = docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | Where-Object { $_ -notmatch "postgres|pgadmin" } | ForEach-Object { ($_ -split ' ')[1] }
+$allImages = docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | Where-Object { $_ -notmatch "postgres|pgadmin|aeq-ive-db" } | ForEach-Object { ($_ -split ' ')[1] }
 if ($allImages) {
     docker rmi -f $allImages
 }
 
 # Remove all volumes except PostgreSQL and pgAdmin volumes
 Print-Step "Removing all Docker volumes (except PostgreSQL and pgAdmin)"
-$volumes = docker volume ls -q | Where-Object { $_ -notmatch "postgres|pgadmin" }
+$volumes = docker volume ls -q | Where-Object { $_ -notmatch "postgres|pgadmin|aeq-ive-db" }
 if ($volumes) {
     $volumes | ForEach-Object { docker volume rm $_ }
 }

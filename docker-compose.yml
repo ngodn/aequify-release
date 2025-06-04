@@ -1,7 +1,23 @@
 services:
+  aeqcore:
+    image: eins0fx/aequify-ive:stable-1.00.1.9999
+    container_name: aeq-ive-core
+    restart: unless-stopped
+    environment:
+      LOG_LEVEL: debug
+    volumes:
+      - ./logs:/app/logs
+      - ./user_data:/app/user_data
+    command: ["serve"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - aeq-net
+
   postgres:
     image: postgres:15
-    container_name: aequify_postgres
+    container_name: aeq-ive-db
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -16,20 +32,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - aeq-net
 
-  aeqcore:
-    image: eins0fx/aequify-ive:stable-1.00.1.9999
-    container_name: aequify_core
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
     restart: unless-stopped
+    ports:
+      - "5050:80"
     environment:
-      LOG_LEVEL: debug
-      DATABASE_URL: postgresql://aequifive:aequifive@postgres:5432/aequifive
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     volumes:
-      - ./user_data:/app/user_data
-    command: ["serve"]
+      - pgadmin_data:/var/lib/pgadmin    
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
+    networks:
+      - aeq-net
 
 volumes:
   postgres_data:
+  pgadmin_data:
+
+networks:
+  aeq-net:
+    driver: bridge

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-06-04 0003 aequify-ive:stable-1.00.1.9999
+```txt
+- Fix critical database precondition issues
+- Added pgadmin to compose stack
+- Updated run scripts
+```
+
 ## 2025-06-04 0002 aequify-ive:stable-1.00.1.9999
 ```txt
 feat: add multiple timeframe support for entry strategy invalidation
