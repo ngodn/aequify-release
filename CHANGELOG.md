@@ -1,7 +1,14 @@
 # Changelog
 
-## 2025-06-04 aequify-ive:stable-1.00.1.9999 0001
+## 2025-06-04 0002 aequify-ive:stable-1.00.1.9999
+```txt
+feat: add multiple timeframe support for entry strategy invalidation
 
+  - Entry Strategy now invalidates if price crosses Bollinger Band middle on ANY configured timeframe
+  - Maintains consistency with existing bollinger_band_swing_filter timeframe pattern
+```
+
+## 2025-06-04 0001 aequify-ive:stable-1.00.1.9999
 ```txt
 Fix volatile entry signal direction inconsistency
 

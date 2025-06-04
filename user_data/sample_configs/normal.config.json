@@ -128,7 +128,11 @@
                     "initial_entry_quantity_in_usdt": 6.5,
                     "hover_distance_pct": -0.75,
                     "hover_refresh_interval_s": 7,
-                    "invalidate_timeframe": "1m"
+                    "invalidate_timeframe": [
+                        "1h",
+                        "4h",
+                        "1d"
+                    ]
                 },
                 "dca": {
                     "mode": "snr",
@@ -165,7 +169,11 @@
                     "initial_entry_quantity_in_usdt": 6.5,
                     "hover_distance_pct": -0.75,
                     "hover_refresh_interval_s": 7,
-                    "invalidate_timeframe": "1m"
+                    "invalidate_timeframe": [
+                        "1h",
+                        "4h",
+                        "1d"
+                    ]
                 },
                 "dca": {
                     "mode": "hovering_dca",
@@ -202,7 +210,11 @@
                     "initial_entry_quantity_in_usdt": 6.5,
                     "hover_distance_pct": 1.0,
                     "hover_refresh_interval_s": 7,
-                    "invalidate_timeframe": "15"
+                    "invalidate_timeframe": [
+                        "1h",
+                        "4h",
+                        "1d"
+                    ]
                 },
                 "dca": {
                     "mode": "hovering_dca",
