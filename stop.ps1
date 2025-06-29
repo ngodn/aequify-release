@@ -12,32 +12,32 @@ function Print-Step {
 Print-Step "Stopping Docker Compose services"
 docker compose down
 
-# Stop all running containers
-Print-Step "Stopping all running containers"
-$runningContainers = docker ps -q
-if ($runningContainers) {
-    docker stop $runningContainers
+# Stop aequify containers
+Print-Step "Stopping aequify containers"
+$aequifyContainers = docker ps -q --filter "name=aequify"
+if ($aequifyContainers) {
+    docker stop $aequifyContainers
 }
 
-# Remove all containers
-Print-Step "Removing all containers"
-$allContainers = docker ps -aq
-if ($allContainers) {
-    docker rm $allContainers
+# Remove aequify containers
+Print-Step "Removing aequify containers"
+$aequifyContainers = docker ps -aq --filter "name=aequify"
+if ($aequifyContainers) {
+    docker rm $aequifyContainers
 }
 
-# Remove all images forcefully
-Print-Step "Removing all Docker images"
-$allImages = docker images -q
-if ($allImages) {
-    docker rmi -f $allImages
+# Remove aequify images
+Print-Step "Removing aequify images"
+$aequifyImages = docker images -q --filter "reference=eins0fx/aequify*"
+if ($aequifyImages) {
+    docker rmi -f $aequifyImages
 }
 
-# Remove all volumes
-Print-Step "Removing all Docker volumes"
-$volumes = docker volume ls -q
-if ($volumes) {
-    $volumes | ForEach-Object { docker volume rm $_ }
+# Remove aequify volumes (if any)
+Print-Step "Removing aequify volumes"
+$aequifyVolumes = docker volume ls -q --filter "name=aequify"
+if ($aequifyVolumes) {
+    $aequifyVolumes | ForEach-Object { docker volume rm $_ }
 }
 
-Write-Host "`nDocker cleanup completed successfully!" -ForegroundColor Green
+Write-Host "`nAequify Docker cleanup completed successfully!" -ForegroundColor Green

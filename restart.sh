@@ -11,21 +11,21 @@ print_step() {
 print_step "Stopping Docker Compose services"
 docker compose down
 
-# Stop all running containers
-print_step "Stopping all running containers"
-docker stop $(docker ps -aq)
+# Stop aequify containers
+print_step "Stopping aequify containers"
+docker ps -q --filter "name=aequify" | xargs -r docker stop
 
-# Remove all containers
-print_step "Removing all containers"
-docker rm $(docker ps -aq)
+# Remove aequify containers
+print_step "Removing aequify containers"
+docker ps -aq --filter "name=aequify" | xargs -r docker rm
 
-# Remove all images forcefully
-print_step "Removing all Docker images"
-docker rmi -f $(docker images -aq)
+# Remove aequify images
+print_step "Removing aequify images"
+docker images -q --filter "reference=eins0fx/aequify*" | xargs -r docker rmi -f
 
-# Remove all volumes
-print_step "Removing all Docker volumes"
-docker volume ls -q | xargs -r docker volume rm
+# Remove aequify volumes (if any)
+print_step "Removing aequify volumes"
+docker volume ls -q --filter "name=aequify" | xargs -r docker volume rm
 
 # Start compose services in detached mode
 print_step "Starting Docker Compose services"
@@ -33,4 +33,4 @@ docker compose up -d
 
 # Show logs
 print_step "Showing Docker Compose logs"
-docker compose logs -f
+docker compose logs -f aequify
