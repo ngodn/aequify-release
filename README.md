@@ -1,6 +1,6 @@
 # Aequify
 
-Aequify is an advanced cryptocurrency futures trading system that automates price volatility trading on Binance Spot and Binance Futures USD-M (USDT-Margined).
+Aequify is an advanced cryptocurrency futures trading system that automates price volatility trading on Binance Futures USD-M (USDT-Margined).
 
 ## License
 
@@ -14,10 +14,10 @@ For inquiries, support, or license information, please contact through:
 
 ## Version
 
-codename `IVE` : `stable-1.00.1.9999`
+stable version : `eins0fx/aequify:gematria-0.33.666.0`
 
 ## Supported Exchanges
 
 Currently supported:
-- Binance Spot
+<!-- - Binance Spot -->
 - Binance Futures USD-M

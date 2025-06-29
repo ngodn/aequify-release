@@ -11,20 +11,20 @@ print_step() {
 print_step "Stopping Docker Compose services"
 docker compose down
 
-# Stop all running containers except PostgreSQL and pgAdmin
-print_step "Stopping all running containers (except PostgreSQL and pgAdmin)"
-docker ps --format "table {{.Names}}" | grep -v -E "(postgres|pgadmin|aeq-ive-db)" | grep -v NAMES | xargs -r docker stop
+# Stop aequify containers
+print_step "Stopping aequify containers"
+docker ps -q --filter "name=aequify" | xargs -r docker stop
 
-# Remove all containers except PostgreSQL and pgAdmin
-print_step "Removing all containers (except PostgreSQL and pgAdmin)"
-docker ps -a --format "table {{.Names}}" | grep -v -E "(postgres|pgadmin|aeq-ive-db)" | grep -v NAMES | xargs -r docker rm
+# Remove aequify containers
+print_step "Removing aequify containers"
+docker ps -aq --filter "name=aequify" | xargs -r docker rm
 
-# Remove all images except PostgreSQL and pgAdmin images
-print_step "Removing all Docker images (except PostgreSQL and pgAdmin)"
-docker images --format "table {{.Repository}}:{{.Tag}}" | grep -v -E "(postgres|pgadmin|aeq-ive-db)" | grep -v REPOSITORY | xargs -r docker rmi -f
+# Remove aequify images
+print_step "Removing aequify images"
+docker images -q --filter "reference=eins0fx/aequify*" | xargs -r docker rmi -f
 
-# Remove all volumes except PostgreSQL and pgAdmin volumes
-print_step "Removing all Docker volumes (except PostgreSQL and pgAdmin)"
-docker volume ls -q | grep -v -E "(postgres|pgadmin|aeq-ive-db)" | xargs -r docker volume rm
+# Remove aequify volumes (if any)
+print_step "Removing aequify volumes"
+docker volume ls -q --filter "name=aequify" | xargs -r docker volume rm
 
-echo "Docker cleanup completed successfully! (PostgreSQL and pgAdmin preserved)"
+echo "Aequify Docker cleanup completed successfully!"

@@ -1,60 +1,16 @@
+# AEQUIFY - codename:gematria
+
+x-shared_environment: &shared_environment
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  
 services:
-  aeqcore:
-    image: eins0fx/aequify-ive:stable-1.00.1.9999
-    container_name: aeq-ive-core
-    restart: unless-stopped
+  aequify:
+    image: eins0fx/aequify:gematria-0.33.666.0
     environment:
-      LOG_LEVEL: debug
+      <<: *shared_environment
+    ports:
+      - '8080:8080'
     volumes:
       - ./logs:/app/logs
       - ./user_data:/app/user_data
-    command: ["serve"]
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - aeq-net
-
-  postgres:
-    image: postgres:15
-    container_name: aeq-ive-db
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: aequifive
-      POSTGRES_PASSWORD: aequifive
-      POSTGRES_DB: aequifive
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U aequifive -d aequifive"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - aeq-net
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin4
-    restart: unless-stopped
-    ports:
-      - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin    
-    depends_on:
-      - postgres
-    networks:
-      - aeq-net
-
-volumes:
-  postgres_data:
-  pgadmin_data:
-
-networks:
-  aeq-net:
-    driver: bridge
+    command: ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "8080"]

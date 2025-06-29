@@ -12,32 +12,32 @@ function Print-Step {
 Print-Step "Stopping Docker Compose services"
 docker compose down
 
-# Stop all running containers except PostgreSQL and pgAdmin
-Print-Step "Stopping all running containers (except PostgreSQL and pgAdmin)"
-$runningContainers = docker ps -q --filter "name=^(?!.*(postgres|pgadmin|aeq-ive-db)).*"
-if ($runningContainers) {
-    docker stop $runningContainers
+# Stop aequify containers
+Print-Step "Stopping aequify containers"
+$aequifyContainers = docker ps -q --filter "name=aequify"
+if ($aequifyContainers) {
+    docker stop $aequifyContainers
 }
 
-# Remove all containers except PostgreSQL and pgAdmin
-Print-Step "Removing all containers (except PostgreSQL and pgAdmin)"
-$allContainers = docker ps -aq --filter "name=^(?!.*(postgres|pgadmin|aeq-ive-db)).*"
-if ($allContainers) {
-    docker rm $allContainers
+# Remove aequify containers
+Print-Step "Removing aequify containers"
+$aequifyContainers = docker ps -aq --filter "name=aequify"
+if ($aequifyContainers) {
+    docker rm $aequifyContainers
 }
 
-# Remove all images except PostgreSQL and pgAdmin images
-Print-Step "Removing all Docker images (except PostgreSQL and pgAdmin)"
-$allImages = docker images --format "{{.Repository}}:{{.Tag}} {{.ID}}" | Where-Object { $_ -notmatch "postgres|pgadmin|aeq-ive-db" } | ForEach-Object { ($_ -split ' ')[1] }
-if ($allImages) {
-    docker rmi -f $allImages
+# Remove aequify images
+Print-Step "Removing aequify images"
+$aequifyImages = docker images -q --filter "reference=eins0fx/aequify*"
+if ($aequifyImages) {
+    docker rmi -f $aequifyImages
 }
 
-# Remove all volumes except PostgreSQL and pgAdmin volumes
-Print-Step "Removing all Docker volumes (except PostgreSQL and pgAdmin)"
-$volumes = docker volume ls -q | Where-Object { $_ -notmatch "postgres|pgadmin|aeq-ive-db" }
-if ($volumes) {
-    $volumes | ForEach-Object { docker volume rm $_ }
+# Remove aequify volumes (if any)
+Print-Step "Removing aequify volumes"
+$aequifyVolumes = docker volume ls -q --filter "name=aequify"
+if ($aequifyVolumes) {
+    $aequifyVolumes | ForEach-Object { docker volume rm $_ }
 }
 
-Write-Host "`nDocker cleanup completed successfully! (PostgreSQL and pgAdmin preserved)" -ForegroundColor Green
+Write-Host "`nAequify Docker cleanup completed successfully!" -ForegroundColor Green

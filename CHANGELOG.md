@@ -1,5 +1,12 @@
 # Changelog
 
+## `codename:gematria` eins0fx/aequify:gematria-0.33.666.0
+```txt
+- Introducing APEX Engine, Adaptive Parameter EXploration to adaptively change parameters in analysis engine based on Gradient Descent
+- Major Bug Fixes for race conditions issues
+- Spot is disabled in this version due to issues with dust assets
+```
+
 ## 2025-06-04 0004 aequify-ive:stable-1.00.1.9999
 ```txt
 - Replace invalidation method in Entry Strategy with time based check instead of BB

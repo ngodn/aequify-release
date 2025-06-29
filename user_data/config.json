@@ -1,26 +1,38 @@
 {
-    "account_id": "YOUR_BINANCE_USER_ID",
-    "filters": {
-        "entry": {
-            "pricechangepct24hr_filter": {
+    "accountId": "YOUR_BINANCE_USER_ID",
+    "trading": {
+        "disableTradingOnWindowUTC": [
+            [2100, 2359]
+        ],
+        "futures": {
+            "marginMode": "ISOLATED",
+            "leverage": 10,
+            "long": {
                 "enabled": true,
-                "spot": {
-                    "pct_higher_than": 999.0,
-                    "pct_lower_than": -999.0
-                },
-                "futures": {
-                    "long": {
-                        "pct_higher_than": 5.0,
-                        "pct_lower_than": -5.0
-                    },
-                    "short": {
-                        "pct_higher_than": 5.0,
-                        "pct_lower_than": -5.0
-                    }
-                }
+                "initialEntrySizeUSDT": 6.5,
+                "maximumPositionSizeUSDT": 100.0,
+                "riskManagement": "PRIORITIZE_DCA"
             },
-            "symbol_filter": {
+            "short": {
                 "enabled": true,
+                "initialEntrySizeUSDT": 6.5,
+                "maximumPositionSizeUSDT": 100.0,
+                "riskManagement": "PRIORITIZE_DCA"
+            }
+        }
+    },
+    "filters": [
+        {
+            "name": "absolute_price_percentage_change",
+            "enabled": true,
+            "config": {
+                "top": 40
+            }
+        },
+        {
+            "name": "symbol_filter",
+            "enabled": true,
+            "config": {
                 "pair": "USDT",
                 "blacklist": [
                     "ALPACA",
@@ -38,281 +50,37 @@
                     "DAR",
                     "REEF",
                     "FTM",
-                    "LINA"
+                    "LINA",
+                    "BTC",
+                    "ETH",
+                    "SOL",
+                    "XRP",
+                    "ADA",
+                    "DOT",
+                    "LINK",
+                    "BCH",
+                    "LTC",
+                    "SC",
+                    "RAY",
+                    "FTT",
+                    "KEY",
+                    "NEWT",
+                    "DEXE"
+
                 ],
                 "whitelist": [
-                    "CHILLGUY",
-                    "TURBO",
-                    "MOODENG"
+                    "MYX"
                 ]
-            },
-            "age_filter": {
-                "enabled": true,
-                "older_than": "1d"
-            },
-            "support_filter": {
-                "enabled": true,
-                "timeframe": "1h",
-                "minimum_n_of_level": 2
-            },
-            "resistance_filter": {
-                "enabled": true,
-                "timeframe": "1h",
-                "minimum_n_of_level": 2
-            },
-            "bollingerband_swing_filter": {
-                "enabled": true,
-                "length": 20,
-                "stddev_mult": 3,
-                "source": "CLOSE",
-                "n_candle_for_signal_lookback": 8,
-                "signal_bb_timeframe": [
-                    "1h",
-                    "4h",
-                    "1d"
-                ],
-                "n_candle_for_confirmation_lookback": 3,
-                "confirmation_bb_timeframe": "1h",
-                "skip_bb_confirmation": true,
-                "confirm_on_passing_sr_level_timeframe": "1h",
-                "confirm_on_passing_n_of_sr_level": 2,
-                "skip_sr_level_confirmation": true
-            }
-        },
-        "dca": {
-            "symbol_filter": {
-                "enabled": true,
-                "pair": "USDT",
-                "blacklist": [],
-                "whitelist": []
-            }
-        },
-        "exit": {
-            "symbol_filter": {
-                "enabled": true,
-                "pair": "USDT",
-                "blacklist": [],
-                "whitelist": []
             }
         }
-    },
-    "risk_management": {
-        "auto_profit_transfer": {
-            "enabled": false,
-            "target_wallet": "FUNDING",
-            "daily_profit_pct_threshold": 50.0
-        },
-        "time_based_stoploss": {
-            "enabled": false,
-            "activate_only_for_position_with_size_less_than": 20.0,
-            "activate_when_ROI_pct_is": -50.0,
-            "exit_mode": "FORCE_CLOSE_POSITION"
-        }
-    },
-    "trading": {
-        "spot": {
-            "enabled": false,
-            "wallet_exposure_per_symbol": 150
-        },
-        "futures": {
-            "long_enabled": true,
-            "short_enabled": true,
-            "margin_mode": "CROSSED",
-            "leverage": 10,
-            "wallet_exposure_per_symbol": 150
-        },
-        "strategy": {
-            "spot": {
-                "max_running_symbols": 150,
-                "entry": {
-                    "initial_entry_quantity_in_usdt": 10.5,
-                    "hover_distance_pct": -0.75,
-                    "hover_refresh_interval_s": 7,
-                    "invalidate_after_s": 300
-                },
-                "dca": {
-                    "mode": "snr",
-                    "snr": {
-                        "lookback_period": "3M",
-                        "max_n_of_dca": 2,
-                        "level_selection": "CLOSEST",
-                        "dca_size_multiplier": 2.5
-                    },
-                    "hovering_dca": {
-                        "hover_distance_pct": -1.0,
-                        "hover_refresh_interval_s": 8,
-                        "dca_size_multiplier": 5,
-                        "max_position_size_in_usdt": 100
-                    }
-                },
-                "trailing_tp": {
-                    "static_tp_distance_pct": 2.0,
-                    "trailing_activation_distance_pct_from_position_price": 0.35,
-                    "trailing_tp_interval_s": 13,
-                    "tp_upperbound": {
-                        "order_type": "LIMIT",
-                        "distance_pct_from_current_price": 1.0
-                    },
-                    "tp_lowerbound": {
-                        "order_type": "STOP",
-                        "distance_pct_from_current_price": -0.25
-                    }
-                }
-            },
-            "long": {
-                "max_running_symbols": 150,
-                "entry": {
-                    "initial_entry_quantity_in_usdt": 10.5,
-                    "hover_distance_pct": -0.75,
-                    "hover_refresh_interval_s": 7,
-                    "invalidate_after_s": 300
-                },
-                "dca": {
-                    "mode": "hovering_dca",
-                    "snr": {
-                        "lookback_period": "3M",
-                        "max_n_of_dca": 2,
-                        "level_selection": "CLOSEST",
-                        "dca_size_multiplier": 2.5
-                    },
-                    "hovering_dca": {
-                        "hover_distance_pct": -1.0,
-                        "hover_refresh_interval_s": 8,
-                        "dca_size_multiplier": 2.5,
-                        "max_position_size_in_usdt": 100
-                    }
-                },
-                "trailing_tp": {
-                    "static_tp_distance_pct": 2.0,
-                    "trailing_activation_distance_pct_from_position_price": 0.35,
-                    "trailing_tp_interval_s": 5,
-                    "tp_upperbound": {
-                        "order_type": "LIMIT",
-                        "distance_pct_from_current_price": 1.0
-                    },
-                    "tp_lowerbound": {
-                        "order_type": "STOP",
-                        "distance_pct_from_current_price": -0.25
-                    }
-                }
-            },
-            "short": {
-                "max_running_symbols": 150,
-                "entry": {
-                    "initial_entry_quantity_in_usdt": 6.5,
-                    "hover_distance_pct": 1.0,
-                    "hover_refresh_interval_s": 7,
-                    "invalidate_after_s": 300
-                },
-                "dca": {
-                    "mode": "hovering_dca",
-                    "snr": {
-                        "lookback_period": "3M",
-                        "max_n_of_dca": 2,
-                        "level_selection": "CLOSEST",
-                        "dca_size_multiplier": 2.5
-                    },
-                    "hovering_dca": {
-                        "hover_distance_pct": 1.0,
-                        "hover_refresh_interval_s": 9,
-                        "dca_size_multiplier": 5,
-                        "max_position_size_in_usdt": 100
-                    }
-                },
-                "trailing_tp": {
-                    "static_tp_distance_pct": 5.0,
-                    "trailing_activation_distance_pct_from_position_price": -0.35,
-                    "trailing_tp_interval_s": 5,
-                    "tp_upperbound": {
-                        "order_type": "STOP",
-                        "distance_pct_from_current_price": 0.25
-                    },
-                    "tp_lowerbound": {
-                        "order_type": "LIMIT",
-                        "distance_pct_from_current_price": -1.0
-                    }
-                }
-            }
-        }
-    },
-    "plugin": {
-        "eins0fxSNR": {
-            "enabled": true,
-            "session": "0000-0100",
-            "source": "CLOSE",
-            "lookback_period": "3M"
-        },
-        "volatile_entry": {
-            "enabled": true,
-            "filters_to_disable": [
-                "support_filter",
-                "resistance_filter",
-                "bollingerband_swing_filter"
-            ],
-            "tickbars": {
-                "ticks_count_per_candle": 24,
-                "history_type": "LAST_PRICE",
-                "range": "30m"
-            },
-            "entry_validation": {
-                "spot": {
-                    "minimum_price_change_pct": -0.4,
-                    "detection_time_window_s": 60,
-                    "minimum_drop_angle": -55,
-                    "entry_type": "HOVER"
-                },
-                "long": {
-                    "minimum_price_change_pct": -0.4,
-                    "detection_time_window_s": 60,
-                    "minimum_drop_angle": -55,
-                    "entry_type": "HOVER"
-                },
-                "short": {
-                    "minimum_price_change_pct": 0.7,
-                    "detection_time_window_s": 60,
-                    "minimum_spike_angle": 55,
-                    "entry_type": "HOVER"
-                }
-            }
-        },
-        "redis": {
-            "hostname": "redis",
-            "port": 6379
-        },
-        "postgres": {
-            "hostname": "postgres",
-            "port": 5432,
-            "POSTGRES_USER": "aequifive",
-            "POSTGRES_PASSWORD": "aequifive",
-            "POSTGRES_DB": "aequifive"
+    ],
+    "engines": {
+        "apex": {
+            "enabled": true
         }
     },
     "developer": {
-        "websocket_streams": {
-            "max_streams": 700,
-            "max_connections": 100
-        },
-        "state_sync_check_interval_s": {
-            "positions_rest_api": 10,
-            "filters": 300
-        },
-        "log_debug": {
-            "api_request": false,
-            "api_response": false,
-            "websocket": false,
-            "candlestore": false,
-            "volatile_entry": false,
-            "snr": false,
-            "dca": true,
-            "position_manager": false,
-            "tp": true
-        },
-        "run_optimizer_in_background": {
-            "volatile_entry": {
-                "enabled": true,
-                "output_file_name": "opt_volatile_entry_result.txt",
-                "time_window_s": 3600
-            }
-        }
+        "logLevel": "INFO",
+        "receiveWindow": 4000
     }
 }
