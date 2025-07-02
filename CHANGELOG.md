@@ -1,5 +1,11 @@
 # Changelog
 
+## `eins0fx/aequify:gematria-0.33.666.2`
+```txt
+feat: Implement multi-phase volume anomaly detection with consecutive window progression
+BREAKING CHANGE: Complete rewrite of Volume Anomaly algorithm and data structures
+```
+
 ## `eins0fx/aequify:gematria-0.33.666.1`
 ```txt
 - Eliminated Volume Anomaly Detector rate limiting bottleneck that was preventing stable Adaptive Parameter EXploration operation 
