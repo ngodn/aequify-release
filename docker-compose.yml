@@ -5,7 +5,7 @@ x-shared_environment: &shared_environment
   
 services:
   aequify:
-    image: eins0fx/aequify:gematria-0.33.666.2
+    image: eins0fx/aequify:gematria-0.33.666.3
     environment:
       <<: *shared_environment
     ports:
