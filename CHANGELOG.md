@@ -1,5 +1,14 @@
 # Changelog
 
+## 2025-07-12 `eins0fx/aequify:gematria-0.33.666.3`
+```
+feat: add 4-hour auto-restart via Docker health check
+
+Add health check that intentionally fails after 4 hours to trigger
+automatic container restart. Uses restart policy 'unless-stopped'
+for self-contained periodic restart without external dependencies.
+```
+
 ## `eins0fx/aequify:gematria-0.33.666.3`
 ```
 fix: separate tracker collections for independent window progressions
